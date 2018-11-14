@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
 * Студент: [Ирина Лихолет](https://up.htmlacademy.ru/javascript/16/user/666209).
-* Наставник: `Неизвестно`.
+* Наставник: `Никита Пиковец`.
 
 ---
 
@@ -30,7 +30,7 @@ _`.editorconfig`, `.eslintrc`, `.gitattributes`, `.gitignore`, `.travis.yml`, `p
 
 Будьте внимательны: нужно клонировать свой репозиторий (форк), а не репозиторий Академии. Также обратите внимание, что клонировать репозиторий нужно через SSH, а не через HTTPS. Нажмите зелёную кнопку в правой части экрана, чтобы скопировать SSH-адрес вашего репозитория:
 
-<img width="769" alt="" src="https://user-images.githubusercontent.com/10909/35275224-1d97a7dc-0050-11e8-89f9-41c9a7b2ae9c.png">
+<img width="769" alt="" src="https://user-images.githubusercontent.com/10909/35275224-1dпеш97a7dc-0050-11e8-89f9-41c9a7b2ae9c.png">
 
 Клонировать репозиторий можно так:
 
