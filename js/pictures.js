@@ -1,7 +1,8 @@
 'use strict';
 
 var PHOTOS_QUANTITY = 25;
-
+var MIN_COMMENTS_COUNT = 1;
+var MAX_COMMENTS_COUNT = 20;
 var COMMENTS = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
@@ -11,7 +12,7 @@ var COMMENTS = [
   'Лица у людей на фотке перекошены, как будто их избивают. Как можно было поймать такой неудачный момент?!'
 ];
 
-var DESCRIPTION = [
+var DESCRIPTIONS = [
   'Тестим новую камеру!',
   'Затусили с друзьями на море',
   'Как же круто тут кормят',
@@ -22,7 +23,7 @@ var DESCRIPTION = [
 
 // Выбирает случайный элемент
 var getRandomElement = function (arr) {
-  var randomIndex = Math.floor(Math.random() * (arr.length - 1));
+  var randomIndex = Math.floor(Math.random() * (arr.length));
   return arr[randomIndex];
 };
 // Выбирает случайное целое число
@@ -31,9 +32,9 @@ var getRandomInteger = function (min, max) {
 };
 
 // Перемешивает массив
-var intermingleArray = function (array) {
+var shuffleArray = function (array) {
   for (var i = array.length - 1; i > 0; i--) {
-    var j = Math.floor(Math.random() * (i + 1));
+    var j = getRandomInteger(1, array.length - 1);
     var temp = array[i];
     array[i] = array[j];
     array[j] = temp;
@@ -51,9 +52,9 @@ var getLikesQuantity = function () {
   return getRandomInteger(15, 200);
 };
 // выбирает комментарий
-var generateComment = function (sentenceCount) {
+var generateComment = function (sentencesCount) {
   var comment = [];
-  for (var i = 0; i < sentenceCount; i++) {
+  for (var i = 0; i < sentencesCount; i++) {
     comment.push(getRandomElement(COMMENTS));
   }
   return comment.join(' ');
@@ -61,7 +62,7 @@ var generateComment = function (sentenceCount) {
 // создает список комментариев
 var generateComments = function () {
   var comments = [];
-  var commentsCount = getRandomInteger(1, 20);
+  var commentsCount = getRandomInteger(MIN_COMMENTS_COUNT, MAX_COMMENTS_COUNT);
   for (var i = 0; i < commentsCount; i++) {
     var sentenceCount = getRandomInteger(1, 2);
     comments.push(generateComment(sentenceCount));
@@ -74,7 +75,7 @@ var renderRandomPicture = function (urlIndex) {
     url: createPhotoUrl(urlIndex),
     likes: getLikesQuantity(),
     comments: generateComments(),
-    description: getRandomElement(DESCRIPTION)
+    description: getRandomElement(DESCRIPTIONS)
   };
   return randomPicture;
 };
@@ -85,11 +86,11 @@ var renderPicturesArray = function () {
   for (var i = 0; i < PHOTOS_QUANTITY; i++) {
     picturesArr.push(renderRandomPicture(i + 1));
   }
-  return intermingleArray(picturesArr);
+  return shuffleArray(picturesArr);
 };
 // собирет карточку с фото
-var renderPhoto = function (temple, photo) {
-  var pictureElement = temple.cloneNode(true);
+var renderPhoto = function (template, photo) {
+  var pictureElement = template.cloneNode(true);
 
   pictureElement.querySelector('.picture__img').src = photo.url;
   pictureElement.querySelector('.picture__likes').textContent = photo.likes;
@@ -97,10 +98,12 @@ var renderPhoto = function (temple, photo) {
 
   return pictureElement;
 };
+
 // перебирает карточки с фото
+var pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
+var picturesList = document.querySelector('.pictures');
+
 var renderPictures = function (pictures) {
-  var pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
-  var picturesList = document.querySelector('.pictures');
   var fragment = document.createDocumentFragment();
 
   for (var i = 0; i < pictures.length; i++) {
@@ -116,12 +119,12 @@ var getAvatarUrl = function () {
   return 'img/avatar-' + getRandomInteger(1, 6) + '.svg';
 };
 
-var renderComment = function (templ, comment) {
-  var commentElement = templ.cloneNode(true);
-  commentElement.querySelector('.social__picture').src = getAvatarUrl();
-  commentElement.querySelector('.social__text').textContent = comment;
+var renderComment = function (template, comment) {
+  var commentsElement = template.cloneNode(true);
+  commentsElement.querySelector('.social__picture').src = getAvatarUrl();
+  commentsElement.querySelector('.social__text').textContent = comment;
 
-  return commentElement;
+  return commentsElement;
 };
 // собирает комментарии
 var renderListOfComments = function (mainPicture, commentsArr) {
@@ -157,9 +160,10 @@ var hideCommentsLoader = function (mainPicture) {
   mainPicture.querySelector('.comments-loader').classList.add('visually-hidden');
 };
 // генерирует случайный блок с картинкой и комментами
-var rendermainPicture = function (picture) {
-  var mainPicture = document.querySelector('.big-picture');
 
+var mainPicture = document.querySelector('.big-picture');
+
+var renderMainPicture = function (picture) {
   changeMainPicture(mainPicture, picture);
   renderListOfComments(mainPicture, picture.comments);
   hideCommentCount(mainPicture);
@@ -168,4 +172,4 @@ var rendermainPicture = function (picture) {
 
 var picturesArr = renderPicturesArray();
 renderPictures(picturesArr);
-rendermainPicture(picturesArr[0]);
+renderMainPicture(picturesArr[0]);
