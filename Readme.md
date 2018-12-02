@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
 * Студент: [Ирина Лихолет](https://up.htmlacademy.ru/javascript/16/user/666209).
-* Наставник: `Никита Пиковец`.
+* Наставник: `Неизвестно`.
 
 ---
 
