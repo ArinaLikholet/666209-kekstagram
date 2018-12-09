@@ -1,5 +1,6 @@
 'use strict';
 
+var DEFAULT_EFFECT = 'none';
 var COMMENTS = [
   'Всё отлично!',
   'В целом всё неплохо. Но не всё.',
@@ -31,6 +32,53 @@ var MAX_COMMENTS_COUNT = 10;
 
 var body = document.querySelector('body');
 
+var EffectParameter = {
+  chrome: {
+    CLASS: 'effects__preview--chrome',
+    PROPERTY: 'grayscale',
+    MIN_VALUE: 0,
+    MAX_VALUE: 1,
+    UNIT: ''
+  },
+  sepia: {
+    CLASS: 'effects__preview--sepia',
+    PROPERTY: 'sepia',
+    MIN_VALUE: 0,
+    MAX_VALUE: 1,
+    UNIT: ''
+  },
+  marvin: {
+    CLASS: 'effects__preview--marvin',
+    PROPERTY: 'invert',
+    MIN_VALUE: 0,
+    MAX_VALUE: 100,
+    UNIT: '%'
+  },
+  phobos: {
+    CLASS: 'effects__preview--phobos',
+    PROPERTY: 'blur',
+    MIN_VALUE: 0,
+    MAX_VALUE: 3,
+    UNIT: 'px'
+  },
+  heat: {
+    CLASS: 'effects__preview--heat',
+    PROPERTY: 'brightness',
+    MIN_VALUE: 1,
+    MAX_VALUE: 3,
+    DEVIDER: 50,
+    UNIT: ''
+  }
+};
+
+var EffectValue = {
+  MAX: 100,
+  DEFAULT: 100,
+};
+var PinValue = {
+  MIN: 0,
+  MAX: 100
+};
 var bigPictureItem = document.querySelector('.big-picture');
 var bigPictureCancel = bigPictureItem.querySelector('.big-picture__cancel');
 var imgUploadOverlay = document.querySelector('.img-upload__overlay');
@@ -38,6 +86,7 @@ var imgUploadButton = document.querySelector('#upload-file');
 var imgUploadForm = document.querySelector('.img-upload__form');
 var imgCloseButton = document.querySelector('.img-upload__cancel');
 var UsersContainer = document.querySelector('.pictures');
+var uploadImage = document.querySelector('.img-upload');
 // нажатие на ESC
 var onButtonEsc = function (evt) {
   if (evt.keyCode === ESC_KEY_CODE) {
@@ -46,16 +95,28 @@ var onButtonEsc = function (evt) {
   }
 };
 // открывает форму
+var effectLevelForm = uploadImage.querySelector('.effect-level');
+var effectLevelFormValue = effectLevelForm.querySelector('.effect-level__value');
+var effectPinButton = effectLevelForm.querySelector('.effect-level__pin');
+var effectDepthToggle = effectLevelForm.querySelector('.effect-level__depth');
+var setDefaultPinPosition = function () {
+  effectPinButton.style.left = EffectValue.DEFAULT + '%';
+  effectDepthToggle.style.width = effectPinButton.style.left;
+};
+imgCloseButton.addEventListener('click', function () {
+  closeUploadWindow();
+});
 var openUploadWindow = function () {
   imgUploadOverlay.classList.remove('hidden');
-  body.classList.remove('modal-open');
+  setDefaultPinPosition();
+  setDefaultEffect();
+  effectLevelFormValue.value = PinValue.MAX;
   document.removeEventListener('keydown', onButtonEsc);
 };
 // закрывает форму
 var closeUploadWindow = function () {
   imgUploadOverlay.classList.add('hidden');
   imgUploadForm.reset();
-  body.classList.remove('modal-open');
   document.removeEventListener('keydown', onButtonEsc);
 };
 imgUploadButton.addEventListener('change', function () {
@@ -74,7 +135,7 @@ var ScaleValue = {
   STEP: 25,
 };
 var scaleControlValue = imgUploadOverlay.querySelector('.scale__control--value');
-
+var imgUploadPreview = document.querySelector('.img-upload__preview');
 var setPhotoScale = function (figure) {
   var currentScale = parseInt(scaleControlValue.value, 10);
   currentScale = currentScale + (ScaleValue.STEP * figure);
@@ -95,14 +156,75 @@ scaleControlBigger.addEventListener('click', function () {
   setPhotoScale(1);
 });
 
-var effectLevelPin = imgUploadOverlay.querySelector('.effect-level__pin');
-var effectsRadio = document.querySelector('.effects');
-var imgUploadPreview = document.querySelector('.img-upload__preview');
-effectLevelPin.addEventListener('mouseup', function () {
+// применение эффекта
+var effectsList = uploadImage.querySelector('.effects__list');
+var currentEffectName = effectsList.querySelector('.effects__radio:checked').value;
+var currentEffectClass = 'effects__preview--' + currentEffectName;
+var imgPreviewItem = imgUploadPreview.querySelector('.img-upload__preview img');
+var effectLevelLine = effectLevelForm.querySelector('.effect-level__line');
+
+var applyEffect = function (value) {
+  switch (currentEffectClass) {
+
+    case EffectParameter.chrome.CLASS:
+      imgPreviewItem.style.filter = EffectParameter.chrome.PROPERTY + '(' + (value) / EffectValue.DEFAULT + EffectParameter.chrome.UNIT + ')';
+      break;
+    case EffectParameter.sepia.CLASS:
+      imgPreviewItem.style.filter = EffectParameter.sepia.PROPERTY + '(' + (value) / EffectValue.DEFAULT + EffectParameter.sepia.UNIT + ')';
+      break;
+    case EffectParameter.marvin.CLASS:
+      imgPreviewItem.style.filter = EffectParameter.marvin.PROPERTY + '(' + (value) * EffectParameter.marvin.MAX_VALUE / EffectValue.MAX + EffectParameter.marvin.UNIT + ')';
+      break;
+    case EffectParameter.phobos.CLASS:
+      imgPreviewItem.style.filter = EffectParameter.phobos.PROPERTY + '(' + (value) * EffectParameter.phobos.MAX_VALUE / EffectValue.DEFAULT + EffectParameter.phobos.UNIT + ')';
+      break;
+    case EffectParameter.heat.CLASS:
+      imgPreviewItem.style.filter = EffectParameter.heat.PROPERTY + '(' + ((value) / EffectParameter.heat.DEVIDER + EffectParameter.heat.MIN_VALUE) + EffectParameter.heat.UNIT + ')';
+      break;
+    default:
+      imgPreviewItem.style.filter = '';
+  }
+
+};
+// imgPreviewItem.style.filter = EffectParameter[currentEffectName].PROPERTY + '(' + value * (EffectParameter[currentEffectName].MAX_VALUE - EffectParameter[currentEffectName].MIN_VALUE) / EffectValue.MAX + EffectParameter[currentEffectName].MIN_VALUE + EffectParameter[currentEffectName].UNIT + ')'
+var setDefaultEffect = function () {
+  var defaultRadioElement = effectsList.querySelector('#effect-' + DEFAULT_EFFECT);
+  defaultRadioElement.checked = true;
+  imgPreviewItem.classList = '';
+  imgPreviewItem.style.filter = '';
+  imgPreviewItem.classList.add(DEFAULT_EFFECT);
+  effectLevelForm.classList.add('hidden');
+};
+
+// применение эффекта
+var onPhotoEffectClick = function (evt) {
+  var target = evt.target;
+  if (target.tagName !== 'INPUT') {
+    return;
+  }
+  imgPreviewItem.classList = '';
+
+  currentEffectName = target.value;
+
+  currentEffectClass = 'effects__preview--' + currentEffectName;
+  imgPreviewItem.classList.add(currentEffectClass);
+  if (currentEffectClass !== 'effects__preview--' + DEFAULT_EFFECT) {
+    effectLevelForm.classList.remove('hidden');
+  } else {
+    effectLevelForm.classList.add('hidden');
+  }
+
+  effectLevelFormValue.value = EffectValue.DEFAULT;
+  applyEffect(EffectValue.DEFAULT);
+  setDefaultPinPosition();
+};
+
+bigPictureCancel.addEventListener('click', function () {
+  closeBigPicture();
 });
-effectsRadio.addEventListener('change', function (e) {
-  imgUploadPreview.className = 'img-upload__preview effects__preview--' + e.target.value;
-});
+
+effectsList.addEventListener('click', onPhotoEffectClick);
+
 // перебрает массив с фото для создания url
 var renderPicturesArray = function () {
   for (var i = 1; i <= 25; i++) {
@@ -140,7 +262,7 @@ var renderListOfComments = function () {
   return commentList;
 };
 
-// Генерация фотографии
+// Генерация фотографий
 var createPictureObjectList = function () {
   for (var i = 0; i < 25; i++) {
     pictures.push({
@@ -228,3 +350,48 @@ var closeBigPicture = function () {
 bigPictureCancel.addEventListener('click', function () {
   closeBigPicture();
 });
+
+var setPinPosition = function (value) {
+  effectPinButton.style.left = value + '%';
+  effectLevelFormValue.value = Math.round(value);
+  effectDepthToggle.style.width = effectPinButton.style.left;
+};
+
+var onMouseDown = function (evt) {
+
+  var startCoordX = evt.clientX;
+  var sliderEffectLineRect = effectLevelLine.getBoundingClientRect();
+  var clickedPosition = (startCoordX - sliderEffectLineRect.left) / sliderEffectLineRect.width * 100;
+
+  setPinPosition(clickedPosition);
+  applyEffect(clickedPosition);
+
+  var onMouseMove = function (moveEvt) {
+    var shiftX = startCoordX - moveEvt.clientX;
+    startCoordX = moveEvt.clientX;
+    // console.log(moveEvt);
+    var movePosition = (effectPinButton.offsetLeft - shiftX) / sliderEffectLineRect.width * 100;
+
+    if (movePosition <= PinValue.MIN) {
+      movePosition = PinValue.MIN;
+      effectLevelFormValue.value = PinValue.MIN;
+    } else if (movePosition >= PinValue.MAX) {
+      movePosition = PinValue.MAX;
+      effectLevelFormValue.value = PinValue.MAX;
+    }
+
+    setPinPosition(movePosition);
+    applyEffect(movePosition);
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mousemove', onMouseUp);
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+};
+
+effectLevelLine.addEventListener('mousedown', onMouseDown);
