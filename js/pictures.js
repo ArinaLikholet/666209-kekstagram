@@ -371,15 +371,6 @@ var onMouseDown = function (evt) {
     startCoordX = moveEvt.clientX;
     // console.log(moveEvt);
     var movePosition = (effectPinButton.offsetLeft - shiftX) / sliderEffectLineRect.width * 100;
-
-    if (movePosition <= PinValue.MIN) {
-      movePosition = PinValue.MIN;
-      effectLevelFormValue.value = PinValue.MIN;
-    } else if (movePosition >= PinValue.MAX) {
-      movePosition = PinValue.MAX;
-      effectLevelFormValue.value = PinValue.MAX;
-    }
-
     setPinPosition(movePosition);
     applyEffect(movePosition);
   };
