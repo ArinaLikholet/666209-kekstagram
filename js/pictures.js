@@ -99,16 +99,14 @@ var effectLevelForm = uploadImage.querySelector('.effect-level');
 var effectLevelFormValue = effectLevelForm.querySelector('.effect-level__value');
 var effectPinButton = effectLevelForm.querySelector('.effect-level__pin');
 var effectDepthToggle = effectLevelForm.querySelector('.effect-level__depth');
-var setDefaultPinPosition = function () {
-  effectPinButton.style.left = EffectValue.DEFAULT + '%';
-  effectDepthToggle.style.width = effectPinButton.style.left;
-};
+
+
 imgCloseButton.addEventListener('click', function () {
   closeUploadWindow();
 });
 var openUploadWindow = function () {
   imgUploadOverlay.classList.remove('hidden');
-  setDefaultPinPosition();
+  setPinPosition(EffectValue.DEFAULT);
   setDefaultEffect();
   effectLevelFormValue.value = PinValue.MAX;
   document.removeEventListener('keydown', onButtonEsc);
@@ -164,35 +162,14 @@ var imgPreviewItem = imgUploadPreview.querySelector('.img-upload__preview img');
 var effectLevelLine = effectLevelForm.querySelector('.effect-level__line');
 
 var applyEffect = function (value) {
-  switch (currentEffectClass) {
-
-    case EffectParameter.chrome.CLASS:
-      imgPreviewItem.style.filter = EffectParameter.chrome.PROPERTY + '(' + (value) / EffectValue.DEFAULT + EffectParameter.chrome.UNIT + ')';
-      break;
-    case EffectParameter.sepia.CLASS:
-      imgPreviewItem.style.filter = EffectParameter.sepia.PROPERTY + '(' + (value) / EffectValue.DEFAULT + EffectParameter.sepia.UNIT + ')';
-      break;
-    case EffectParameter.marvin.CLASS:
-      imgPreviewItem.style.filter = EffectParameter.marvin.PROPERTY + '(' + (value) * EffectParameter.marvin.MAX_VALUE / EffectValue.MAX + EffectParameter.marvin.UNIT + ')';
-      break;
-    case EffectParameter.phobos.CLASS:
-      imgPreviewItem.style.filter = EffectParameter.phobos.PROPERTY + '(' + (value) * EffectParameter.phobos.MAX_VALUE / EffectValue.DEFAULT + EffectParameter.phobos.UNIT + ')';
-      break;
-    case EffectParameter.heat.CLASS:
-      imgPreviewItem.style.filter = EffectParameter.heat.PROPERTY + '(' + ((value) / EffectParameter.heat.DEVIDER + EffectParameter.heat.MIN_VALUE) + EffectParameter.heat.UNIT + ')';
-      break;
-    default:
-      imgPreviewItem.style.filter = '';
-  }
+  imgPreviewItem.style.filter = EffectParameter[currentEffectName].PROPERTY + '(' + value * (EffectParameter[currentEffectName].MAX_VALUE - EffectParameter[currentEffectName].MIN_VALUE) / EffectValue.MAX + EffectParameter[currentEffectName].MIN_VALUE + EffectParameter[currentEffectName].UNIT + ')';
 
 };
-// imgPreviewItem.style.filter = EffectParameter[currentEffectName].PROPERTY + '(' + value * (EffectParameter[currentEffectName].MAX_VALUE - EffectParameter[currentEffectName].MIN_VALUE) / EffectValue.MAX + EffectParameter[currentEffectName].MIN_VALUE + EffectParameter[currentEffectName].UNIT + ')'
+var defaultRadioElement = effectsList.querySelector('#effect-' + DEFAULT_EFFECT);
+
 var setDefaultEffect = function () {
-  var defaultRadioElement = effectsList.querySelector('#effect-' + DEFAULT_EFFECT);
   defaultRadioElement.checked = true;
-  imgPreviewItem.classList = '';
-  imgPreviewItem.style.filter = '';
-  imgPreviewItem.classList.add(DEFAULT_EFFECT);
+  imgPreviewItem.classList.remove(currentEffectClass);
   effectLevelForm.classList.add('hidden');
 };
 
@@ -202,7 +179,7 @@ var onPhotoEffectClick = function (evt) {
   if (target.tagName !== 'INPUT') {
     return;
   }
-  imgPreviewItem.classList = '';
+  imgPreviewItem.classList.remove(currentEffectClass);
 
   currentEffectName = target.value;
 
@@ -216,7 +193,7 @@ var onPhotoEffectClick = function (evt) {
 
   effectLevelFormValue.value = EffectValue.DEFAULT;
   applyEffect(EffectValue.DEFAULT);
-  setDefaultPinPosition();
+  setPinPosition(EffectValue.DEFAULT);
 };
 
 bigPictureCancel.addEventListener('click', function () {
@@ -308,8 +285,8 @@ var pictureCommentsLength = bigPictureItem.querySelector('.comments-count');
 var pictureDescription = bigPictureItem.querySelector('.social__caption');
 var pictureCommentsCount = bigPictureItem.querySelector('.social__comment-count');
 var newCommentButton = bigPictureItem.querySelector('.comments-loader');
-// собирет карточку с фото
 
+// собирет карточку с фото
 var renderPhoto = function (pictureIndex) {
   var commentsTemplateContainer = document.createDocumentFragment();
   var picture = pictures[pictureIndex];
@@ -369,8 +346,17 @@ var onMouseDown = function (evt) {
   var onMouseMove = function (moveEvt) {
     var shiftX = startCoordX - moveEvt.clientX;
     startCoordX = moveEvt.clientX;
-    // console.log(moveEvt);
+
     var movePosition = (effectPinButton.offsetLeft - shiftX) / sliderEffectLineRect.width * 100;
+
+    if (movePosition <= PinValue.MIN) {
+      movePosition = PinValue.MIN;
+      effectLevelFormValue.value = PinValue.MIN;
+    } else if (movePosition >= PinValue.MAX) {
+      movePosition = PinValue.MAX;
+      effectLevelFormValue.value = PinValue.MAX;
+    }
+
     setPinPosition(movePosition);
     applyEffect(movePosition);
   };
