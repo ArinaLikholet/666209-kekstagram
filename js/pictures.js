@@ -20,7 +20,7 @@ var DESCRIPTIONS = [
 ];
 var pictures = [];
 
-var picturesUrl = [];
+var picturesUrls = [];
 
 var ESC_KEY_CODE = 27;
 
@@ -85,7 +85,7 @@ var imgUploadOverlay = document.querySelector('.img-upload__overlay');
 var imgUploadButton = document.querySelector('#upload-file');
 var imgUploadForm = document.querySelector('.img-upload__form');
 var imgCloseButton = document.querySelector('.img-upload__cancel');
-var UsersContainer = document.querySelector('.pictures');
+var usersContainer = document.querySelector('.pictures');
 var uploadImage = document.querySelector('.img-upload');
 // нажатие на ESC
 var onButtonEsc = function (evt) {
@@ -109,7 +109,7 @@ var openUploadWindow = function () {
   setPinPosition(EffectValue.DEFAULT);
   setDefaultEffect();
   effectLevelFormValue.value = PinValue.MAX;
-  document.removeEventListener('keydown', onButtonEsc);
+  document.addEventListener('keydown', onButtonEsc);
 };
 // закрывает форму
 var closeUploadWindow = function () {
@@ -162,7 +162,8 @@ var imgPreviewItem = imgUploadPreview.querySelector('.img-upload__preview img');
 var effectLevelLine = effectLevelForm.querySelector('.effect-level__line');
 
 var applyEffect = function (value) {
-  imgPreviewItem.style.filter = EffectParameter[currentEffectName].PROPERTY + '(' + value * (EffectParameter[currentEffectName].MAX_VALUE - EffectParameter[currentEffectName].MIN_VALUE) / EffectValue.MAX + EffectParameter[currentEffectName].MIN_VALUE + EffectParameter[currentEffectName].UNIT + ')';
+  var effectValue = value * (EffectParameter[currentEffectName].MAX_VALUE - EffectParameter[currentEffectName].MIN_VALUE) / EffectValue.MAX + EffectParameter[currentEffectName].MIN_VALUE;
+  imgPreviewItem.style.filter = EffectParameter[currentEffectName].PROPERTY + '(' + effectValue + EffectParameter[currentEffectName].UNIT + ')';
 
 };
 var defaultRadioElement = effectsList.querySelector('#effect-' + DEFAULT_EFFECT);
@@ -205,7 +206,7 @@ effectsList.addEventListener('click', onPhotoEffectClick);
 // перебрает массив с фото для создания url
 var renderPicturesArray = function () {
   for (var i = 1; i <= 25; i++) {
-    picturesUrl.push('photos/' + i + '.jpg');
+    picturesUrls.push('photos/' + i + '.jpg');
   }
 };
 
@@ -226,7 +227,7 @@ var getRandomElementArr = function (array) {
 
 // создает фото url
 var createPictureUrl = function () {
-  return picturesUrl.sort(compare).pop();
+  return picturesUrls.sort(compare).pop();
 };
 
 // Перебирает комментарии и собирает комментарии в список
@@ -274,7 +275,7 @@ var renderPictures = function () {
 
     pictureContainer.appendChild(pictureNewTemplate);
   }
-  UsersContainer.appendChild(pictureContainer);
+  usersContainer.appendChild(pictureContainer);
 };
 
 renderPictures();
