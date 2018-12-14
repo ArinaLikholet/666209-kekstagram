@@ -68,6 +68,9 @@ var EffectParameter = {
     MAX_VALUE: 3,
     DEVIDER: 50,
     UNIT: ''
+  },
+  none: {
+    CLASS: '',
   }
 };
 
