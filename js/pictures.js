@@ -165,10 +165,15 @@ var imgPreviewItem = imgUploadPreview.querySelector('.img-upload__preview img');
 var effectLevelLine = effectLevelForm.querySelector('.effect-level__line');
 
 var applyEffect = function (value) {
-  var effectValue = value * (EffectParameter[currentEffectName].MAX_VALUE - EffectParameter[currentEffectName].MIN_VALUE) / EffectValue.MAX + EffectParameter[currentEffectName].MIN_VALUE;
-  imgPreviewItem.style.filter = EffectParameter[currentEffectName].PROPERTY + '(' + effectValue + EffectParameter[currentEffectName].UNIT + ')';
-
+  if (currentEffectName === 'none') {
+    imgPreviewItem.style.filter = 'none';
+  } else {
+    var effectValue = value * (EffectParameter[currentEffectName].MAX_VALUE -
+      EffectParameter[currentEffectName].MIN_VALUE) / EffectValue.MAX + EffectParameter[currentEffectName].MIN_VALUE;
+    imgPreviewItem.style.filter = EffectParameter[currentEffectName].PROPERTY + '(' + effectValue + EffectParameter[currentEffectName].UNIT + ')';
+  }
 };
+
 var defaultRadioElement = effectsList.querySelector('#effect-' + DEFAULT_EFFECT);
 
 var setDefaultEffect = function () {
