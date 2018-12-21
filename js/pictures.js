@@ -39,28 +39,28 @@ var EffectParameter = {
     PROPERTY: 'grayscale',
     MIN_VALUE: 0,
     MAX_VALUE: 1,
-    UNIT: ''
+    UNIT: '',
   },
   sepia: {
     CLASS: 'effects__preview--sepia',
     PROPERTY: 'sepia',
     MIN_VALUE: 0,
     MAX_VALUE: 1,
-    UNIT: ''
+    UNIT: '',
   },
   marvin: {
     CLASS: 'effects__preview--marvin',
     PROPERTY: 'invert',
     MIN_VALUE: 0,
     MAX_VALUE: 100,
-    UNIT: '%'
+    UNIT: '%',
   },
   phobos: {
     CLASS: 'effects__preview--phobos',
     PROPERTY: 'blur',
     MIN_VALUE: 0,
     MAX_VALUE: 3,
-    UNIT: 'px'
+    UNIT: 'px',
   },
   heat: {
     CLASS: 'effects__preview--heat',
@@ -68,11 +68,11 @@ var EffectParameter = {
     MIN_VALUE: 1,
     MAX_VALUE: 3,
     DEVIDER: 50,
-    UNIT: ''
+    UNIT: '',
   },
   none: {
     CLASS: '',
-  }
+  },
 };
 
 var EffectValue = {
@@ -81,12 +81,12 @@ var EffectValue = {
 };
 var PinValue = {
   MIN: 0,
-  MAX: 100
+  MAX: 100,
 };
 
 var hashtag = {
   maxAmount: 5,
-  maxLength: 20
+  maxLength: 20,
 };
 
 var bigPictureItem = document.querySelector('.big-picture');
@@ -394,13 +394,11 @@ effectLevelLine.addEventListener('mousedown', onMouseDown);
 var textHashtags = document.querySelector('.text__hashtags');
 var textDescription = document.querySelector('.text__description');
 
-
-textHashtags.addEventListener('keyup', hashTagsValidate);
-
-function hashTagsValidate() {
+var hashTagsValidate = function () {
   var tagItem = textHashtags.value.replace(/\s+/g, ' ').trim();
   var tags = tagItem.toLowerCase().split(' ');
-  var tagErrorMessage = '';
+  var tagErrorMessage = ' ';
+  var obj = {};
 
   if (tags.length > hashtag.maxAmount) {
     tagErrorMessage = 'Не должно превышать 5';
@@ -413,30 +411,24 @@ function hashTagsValidate() {
         tagErrorMessage = 'Хэштег не может состоять из одного символа #';
       } else if (hashtagElement.length >= hashtag.maxLength) {
         tagErrorMessage = 'не должно быть символов больше 20';
-      } else if (checkTagRepit(tags).length < tags.length) {
+      } else if (obj[hashtagElement]) {
         tagErrorMessage = 'не должны повторяться';
+      } else if (hashtagElement.lastIndexOf('#') !== 0) {
+        tagErrorMessage = 'Хэштеги должны быть разделены пробелами';
       }
 
       if (tagErrorMessage) {
         break;
       }
+      obj[hashtagElement] = true;
     }
   }
   textHashtags.setCustomValidity(tagErrorMessage);
-}
+  textHashtags.reportValidity();
+};
 
-function checkTagRepit(arr) {
-  var obj = {};
 
-  for (var i = 0; i < arr.length; i++) {
-    var str = arr[i];
-    obj[str] = true;
-  }
-
-  return Object.keys(obj);
-}
-
-textHashtags.addEventListener('input', function () {
+textHashtags.addEventListener('keyup', function () {
   hashTagsValidate();
   invalidHighlighter(textHashtags);
 });
