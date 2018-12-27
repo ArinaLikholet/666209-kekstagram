@@ -124,6 +124,8 @@ var openUploadWindow = function () {
 // закрывает форму
 var closeUploadWindow = function () {
   imgUploadOverlay.classList.add('hidden');
+  imgUploadPreview.removeAttribute('style');
+  imgPreviewItem.removeAttribute('style');
   imgUploadForm.reset();
   document.removeEventListener('keydown', onButtonEsc);
 };
@@ -397,7 +399,7 @@ var textDescription = document.querySelector('.text__description');
 var hashTagsValidate = function () {
   var tagItem = textHashtags.value.replace(/\s+/g, ' ').trim();
   var tags = tagItem.toLowerCase().split(' ');
-  var tagErrorMessage = ' ';
+  var tagErrorMessage = '';
   var obj = {};
 
   if (tags.length > hashtag.maxAmount) {
